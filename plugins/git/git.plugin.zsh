@@ -142,10 +142,13 @@ compdef _git glp=git-log
 #
 # This function return a warning if the current branch is a wip
 function work_in_progress() {
-  if $(git log -n 1 | grep -q -c wip); then
+  # --max-count=1 works around a conflict with SCMBreeze where it uses numbers
+  # as shortcuts for files or branches.
+  if $(git log --max-count=1 | grep -q -c wip); then
     echo "WIP!!"
   fi
 }
 # these alias commit and uncomit wip branches
-alias gwip='git add -A; git ls-files --deleted -z | xargs -0 git rm; git commit -m "wip"'
-alias gunwip='git log -n 1 | grep -q -c wip && git reset HEAD~1'
+# --no-verify will prevent any hooks from running.
+alias gwip='git add -A; git ls-files --deleted -z | xargs -0 git rm; git commit -m "wip" --no-verify'
+alias gunwip='git log --max-count=1 | grep -q -c wip && git reset HEAD~1'
